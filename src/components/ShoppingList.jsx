@@ -9,6 +9,8 @@ const pantryFilterSubstring = [
   "bay lea", "thyme", "cumin", "basil", "ketchup", "mayonnaise",
   "rosemary", "oregano", "parsley"];
 // Measure words
+// TODO: for parse (best effort) subject for alpha sorting within list
+// determine subject to be token after the measure word
 const measureFilterSubstring = [
   "spoon", "cup", "ounce", "oz", "pound", "cube", "slice", "piece", "bunch", "head"
 ]
@@ -17,9 +19,9 @@ const measureFilterSubstring = [
 const groceryDeptFilters = [
   { name: "Canned Goods", keywords: ["can ", "canned", "cans ", "broth"], },
   {
-    name: "Meat", keywords: ["beef", "chicken", "pork", "sausage", "turkey",
+    name: "Meat", keywords: ["beef", "chicken", "pork", "sausage", "turkey", "lamb",
       "ham", "fish", "shrimp", "salmon", "bacon", "steak", "chuck", "brisket", "roast",
-      "tilapia", "lobster", "cod", "branzino", "trout", "tuna"]
+      "tilapia", "lobster", "cod", "branzino", "trout", "tuna", "sirloin", "fillet", "filet"]
   },
   {
     name: "Produce", keywords: ["carrot", "onion", "celery", "radish",
