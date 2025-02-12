@@ -6,6 +6,7 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "/vi-dinners",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -13,7 +14,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: './docs',
+    outDir: "./docs",
     emptyOutDir: true, // also necessary
-  }
+  },
 });
