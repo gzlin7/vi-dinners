@@ -10,7 +10,7 @@ const RecipeCard = ({ index, name, image_url, url, ingredients, onClick, isLocke
   const handleMouseEnter = (event) => {
     const { clientX, clientY } = event; // Get mouse position
     setPosition({
-      top: clientY, 
+      top: clientY,
       left: clientX,
     });
     setShowTooltip(true);
@@ -23,9 +23,8 @@ const RecipeCard = ({ index, name, image_url, url, ingredients, onClick, isLocke
   return (
     <div
       key={index}
-      className={`card ${
-        isLocked ? "locked" : ""
-      } bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition`}
+      className={`card ${isLocked ? "locked" : ""
+        } bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition`}
       onClick={() => onClick(index)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
