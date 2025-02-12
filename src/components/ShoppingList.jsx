@@ -1,39 +1,5 @@
 import React from "react";
-
-// List of substrings to completely omit
-const hardFilterSubstring = ["to taste", "water", "salt", "pepper", "sugar", "flour"];
-// List of substrings probably already have
-const pantryFilterSubstring = [
-  "oil", "butter", "cornstarch",
-  "powder", "soy sauce", "garlic", "vinegar", "paprika", "baking", "honey",
-  "bay lea", "thyme", "cumin", "basil", "ketchup", "mayonnaise",
-  "rosemary", "oregano", "parsley"];
-// Measure words
-// TODO: for parse (best effort) subject for alpha sorting within list
-// determine subject to be token after the measure word
-const measureFilterSubstring = [
-  "spoon", "cup", "ounce", "oz", "pound", "cube", "slice", "piece", "bunch", "head"
-]
-
-// Grocery Dept. separators
-const groceryDeptFilters = [
-  { name: "Canned Goods", keywords: ["can ", "canned", "cans ", "broth"], },
-  {
-    name: "Meat", keywords: ["beef", "chicken", "pork", "sausage", "turkey", "lamb",
-      "ham", "fish", "shrimp", "salmon", "bacon", "steak", "chuck", "brisket", "roast",
-      "tilapia", "lobster", "cod", "branzino", "trout", "tuna", "sirloin", "fillet", "filet"]
-  },
-  {
-    name: "Produce", keywords: ["carrot", "onion", "celery", "radish",
-      "apple", "mushroom", "shallot", "lime", "lemon", "orange", "tomato",
-      "lettuce", "cabbage", "potato", "leek", "turnip", "bell", "asparagus",
-      "broccoli", "cauliflower", "peas", "beans", "spinach", "green", "berr",
-      "squash", "zucc"
-    ]
-  },
-  { name: "Dry Grains", keywords: ["rice", "pasta", "noodle", "shell", "tortilla", "vermicelli"] },
-  { name: "Dairy", keywords: ["egg", "milk", "cream", "cheese", "yogurt", "half-and-half"] }
-];
+import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "../lib/utils.js"
 
 const ShoppingList = ({ selectedRecipes }) => {
   // Extract Ingredients
@@ -94,17 +60,17 @@ const ShoppingList = ({ selectedRecipes }) => {
         ))}
       </div>
 
-      {/* Right column: Filtered ingredients */}
+      {/* Right column: Pantry ingredients */}
       <div className="filtered-list">
         <h3 className="text-xl font-bold">Double check pantry </h3>
         <ul className="list-disc pl-4">
-          < li > I'll always assume you have salt, pepper, sugar, and flour, so I omit them! </li>
+          < li > I always assume you have salt, pepper, sugar, and flour</li>
           {pantryIngredients.length > 0 ? (
             pantryIngredients.map((ingredient, index) => (
               <li key={index}>{ingredient}</li>
             ))
           ) : (
-            <li>No ingredients filtered</li>
+            <li>No additional ingredients in this category</li>
           )
           }
         </ul>
