@@ -5,42 +5,26 @@ import recipes from "./lib/data/allrecipes_mains.json";
 function App() {
   const [selectedRecipes, setSelectedRecipes] = useState([]);
   // indexes of locked
-  const [lockedRecipes, setlockedRecipes] = useState([]);
+  const [lockedIndices, setlockedIndices] = useState([]);
+  const numRecipes = recipes.length;
 
   // Function to get 6 random recipes
   const randomizeRecipes = () => {
-    const unlockedRecipes = recipes.filter(
-      (recipe, index) => !lockedRecipes.includes(index)
-    );
-    const shuffledRecipes = [...unlockedRecipes];
-
-    // Shuffle only unlocked recipes
-    for (let i = shuffledRecipes.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledRecipes[i], shuffledRecipes[j]] = [
-        shuffledRecipes[j],
-        shuffledRecipes[i],
-      ]; // Shuffle array
-    }
-
-    // Create the new selectedRecipes array
-    const newSelectedRecipes = recipes.map((recipe, index) => {
-      // If the recipe is locked, keep it at its original index
-      if (lockedRecipes.includes(index)) {
-        return recipe;
+    let newSelectedRecipes = [];
+    for (let i=0; i<6; i++) {
+      if (lockedIndices.includes(i)) {
+        newSelectedRecipes.push(selectedRecipes[i])
       } else {
-        // Otherwise, take a recipe from the shuffled list (take one from the shuffledRecipes)
-        return shuffledRecipes.pop();
+        // could have dupes...
+        newSelectedRecipes.push(recipes[Math.floor(Math.random() * numRecipes)-1])
       }
-    });
-
-    // Ensure we have exactly 6 recipes selected
-    setSelectedRecipes(newSelectedRecipes.slice(0, 6));
+    }
+   setSelectedRecipes(newSelectedRecipes);  
   };
 
   // Function to toggle lock/unlock for a recipe by its index
   const toggleLockRecipe = (index) => {
-    setlockedRecipes((prevLocked) =>
+    setlockedIndices((prevLocked) =>
       prevLocked.includes(index)
         ? prevLocked.filter((lockedIndex) => lockedIndex !== index) // Remove lock
         : [...prevLocked, index] // Add lock
@@ -54,7 +38,7 @@ function App() {
       <RecipeCards
         recipes={selectedRecipes}
         onCardClick={toggleLockRecipe}
-        lockedRecipes={lockedRecipes}
+        lockedIndices={lockedIndices}
       />
     </div>
   );
