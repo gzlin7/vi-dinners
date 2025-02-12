@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import RecipeCards from "./components/RecipeCards";
 import ShoppingList from "./components/ShoppingList";
 import recipes from "./lib/data/allrecipes_mains.json";
-import { jsPDF } from "jspdf";
+import {generatePdf} from "./lib/exportPdf.js";
 
 function App() {
   const shoppingListRef = useRef();
@@ -45,20 +45,7 @@ function App() {
 
   // Function to export shopping list + recipes as PDF
   const exportToPdf = () => {
-    const doc = new jsPDF();
-    doc.html(shoppingListRef.current, {
-      callback: function (doc) {
-        doc.save('shopping_list-file.pdf');
-      },
-      margin: [10, 10, 10, 10],
-      x: 10,
-      y: 10,
-      html2canvas: {
-        scale: 0.3,  // Reduce scale to make it fit in the PDF (use 1 to keep original size)
-      },
-      autoPaging: true,  // Automatically adjusts for multi-page content
-      maxWidth: 190,  // Max width for the content to avoid overflow (use less than 210 to fit on one page)
-    });
+    generatePdf(selectedRecipes, shoppingListRef.current.getGroceries());
   };
 
   return (
@@ -91,9 +78,7 @@ function App() {
         onCardClick={toggleLockRecipe}
         lockedIndices={lockedIndices}
       />
-      <div ref={shoppingListRef}> 
-      <ShoppingList selectedRecipes={selectedRecipes} />
-      </div>
+        <ShoppingList ref={shoppingListRef}  selectedRecipes={selectedRecipes} />
     </div>
   );
 }

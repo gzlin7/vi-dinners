@@ -1,7 +1,7 @@
-import {React} from "react";
-import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "../lib/utils.js"
+import {React, forwardRef, useImperativeHandle} from "react";
+import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "../lib/groceryFilters.js"
 
-const ShoppingList = ({ selectedRecipes }) => {
+const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
   // Extract Ingredients
   const ingredientSet = new Set();
   selectedRecipes.forEach((recipe) => {
@@ -36,6 +36,14 @@ const ShoppingList = ({ selectedRecipes }) => {
     });
   }
   groceryDeptDict["Miscellaneous"] = groceryIngredients;
+  
+  const getGroceries = () => {
+    return groceryDeptDict;
+  }
+
+  useImperativeHandle(ref, () => ({
+    getGroceries: getGroceries
+  }));
 
   return (
     <div className="shopping-list grid grid-cols-2 gap-6">
@@ -76,6 +84,6 @@ const ShoppingList = ({ selectedRecipes }) => {
       </div>
     </div>
   );
-};
+});
 
 export default ShoppingList;
