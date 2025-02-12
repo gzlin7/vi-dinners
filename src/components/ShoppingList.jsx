@@ -1,4 +1,4 @@
-import React from "react";
+import {React} from "react";
 import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "../lib/utils.js"
 
 const ShoppingList = ({ selectedRecipes }) => {
@@ -27,7 +27,6 @@ const ShoppingList = ({ selectedRecipes }) => {
   // Create a filtered list for each grocery dept
   const groceryDeptDict = {};
   for (const gf of groceryDeptFilters) {
-    console.log(gf);
     groceryDeptDict[gf.name] = groceryIngredients.filter(ingredient => {
       return gf.keywords.some(substring => ingredient.toLowerCase().includes(substring));
     });

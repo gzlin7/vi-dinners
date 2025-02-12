@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RecipeCards from "./components/RecipeCards";
 import ShoppingList from "./components/ShoppingList";
 import recipes from "./lib/data/allrecipes_mains.json";
+import { jsPDF } from "jspdf";
 
 function App() {
+  const shoppingListRef = useRef();
   const [selectedRecipes, setSelectedRecipes] = useState([]);
   // indexes of locked
   const [lockedIndices, setlockedIndices] = useState([]);
@@ -41,16 +43,57 @@ function App() {
     );
   };
 
+  // Function to export shopping list + recipes as PDF
+  const exportToPdf = () => {
+    const doc = new jsPDF();
+    doc.html(shoppingListRef.current, {
+      callback: function (doc) {
+        doc.save('shopping_list-file.pdf');
+      },
+      margin: [10, 10, 10, 10],
+      x: 10,
+      y: 10,
+      html2canvas: {
+        scale: 0.3,  // Reduce scale to make it fit in the PDF (use 1 to keep original size)
+      },
+      autoPaging: true,  // Automatically adjusts for multi-page content
+      maxWidth: 190,  // Max width for the content to avoid overflow (use less than 210 to fit on one page)
+    });
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">VI Dinners</h1>
-      <button onClick={randomizeRecipes}>Randomize 6 Recipes</button>
+
+      <h1 className="text-3xl font-bold text-center mb-6">🍲 VI Dinners 🍽️</h1>
+
+      <div className="w-full flex justify-center mt-4">
+        <div className="flex gap-2">
+          <button
+            onClick={randomizeRecipes}
+            className="px-6 py-3 text-lg bg-[#ff6347] text-white font-bold rounded-lg shadow-md transition-all duration-300 ease-in-out hover:bg-[#e5533d] active:scale-95"
+          >
+            Randomize Recipes
+          </button>
+
+          <button
+            onClick={exportToPdf}
+            className="px-6 py-3 text-lg bg-[#187927] text-white font-bold rounded-lg shadow-md transition-all duration-300 ease-in-out hover:bg-[#0f5f30] active:scale-95"
+          >
+            Export as PDF
+          </button>
+        </div>
+      </div>
+
+      <h1 className="text-center">Click on a recipe's image to lock it. Click on the recipe title to visit its website.</h1 >
+
       <RecipeCards
         recipes={selectedRecipes}
         onCardClick={toggleLockRecipe}
         lockedIndices={lockedIndices}
       />
+      <div ref={shoppingListRef}> 
       <ShoppingList selectedRecipes={selectedRecipes} />
+      </div>
     </div>
   );
 }

@@ -70,26 +70,8 @@ html {
   padding: 1rem;
 }
 
-/* Center the button horizontally */
-button {
-  padding: 12px 30px;
-  font-size: 18px;
-  background-color: #ff6347;
-  /* Tomato color */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
-  margin: 20px auto;
-  display: block;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 /* Center button on the page */
 button:hover {
-  background-color: #ff4500;
   /* Darker red when hovered */
   transform: scale(1.05);
 }

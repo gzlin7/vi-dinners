@@ -17,7 +17,7 @@ export const measureFilterSubstring = [
 
 // Grocery Dept. separators
 export const groceryDeptFilters = [
-  { name: "Canned Goods", keywords: ["can ", "canned", "cans ", "broth"], },
+  { name: "Canned Goods", keywords: ["can ", "canned", "cans ", "broth", "stock"], },
   {
     name: "Meat", keywords: ["beef", "chicken", "pork", "sausage", "turkey", "lamb",
       "ham", "fish", "shrimp", "salmon", "bacon", "steak", "chuck", "brisket", "roast",
