@@ -9,24 +9,25 @@ function App() {
   const [selectedRecipes, setSelectedRecipes] = useState([]);
   // indexes of locked
   const [lockedIndices, setlockedIndices] = useState([]);
-  const numRecipes = recipes.length;
-  3;
+  const numTotalRecipes = recipes.length;
+  const [numDisplayedRecipes, setNumDisplayedRecipes] = useState(6);
 
-  // populate recipes on first load
+  // Populate recipes on first load
   useEffect(() => {
     randomizeRecipes();
-  }, []);
+    setlockedIndices([]);
+  }, [numDisplayedRecipes]); // Re-randomize when number of recipes changes
 
-  // Function to get 6 random recipes
+  // Function to get desired number (1 to 6) of random recipes
   const randomizeRecipes = () => {
     let newSelectedRecipes = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < numDisplayedRecipes; i++) {
       if (lockedIndices.includes(i)) {
         newSelectedRecipes.push(selectedRecipes[i]);
       } else {
         // could have dupes...
         newSelectedRecipes.push(
-          recipes[Math.floor(Math.random() * numRecipes) - 1]
+          recipes[Math.floor(Math.random() * numTotalRecipes) - 1]
         );
       }
     }
@@ -52,6 +53,20 @@ function App() {
     <div className="w-full min-h-screen bg-gray-100 p-6">
 
       <h1 className="text-3xl font-bold text-center mb-6">🍲 VI Dinners 🍽️</h1>
+
+      {/* Slider to control number of recipes */}
+      <div className="w-full flex justify-center mt-4">
+        <label className="font-semibold mr-2">Number of recipes:</label>
+        <input
+          type="range"
+          min="1"
+          max="6"
+          value={numDisplayedRecipes}
+          onChange={(e) => setNumDisplayedRecipes(parseInt(e.target.value))}
+          className="w-40"
+        />
+        <span className="ml-2 font-bold">{numDisplayedRecipes}</span>
+      </div>
 
       <div className="w-full flex justify-center mt-4">
         <div className="flex gap-2">
