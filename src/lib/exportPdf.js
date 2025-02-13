@@ -61,8 +61,8 @@ export const generatePdf = (selectedRecipes, groceryItemsMap) => {
           maxWidth: maxLeftWidth,
         });
         // Handle when overflows past next line
-        let breaklines = Math.ceil(doc.getTextWidth(item) / maxLeftWidth);
-        yPosition += 10 + 3 * (breaklines - 1);
+        let breakLines = Math.ceil(doc.getTextWidth(item) / maxLeftWidth);
+        yPosition += 10 + 3 * (breakLines - 1);
       });
     }
   };

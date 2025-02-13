@@ -1,8 +1,3 @@
-# React + Vite
+# 🍲 VI Dinners 🍽️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Recipe generator site to pick recipes for the week and compile combined grocery shopping list. Eliminates hassle of deciding what to make and saves trips to the grocery store. Inspired by the philosophy of 6dinners, but more flexible and customized.
