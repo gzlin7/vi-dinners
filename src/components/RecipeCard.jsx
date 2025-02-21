@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 
 
-const RecipeCard = ({ index, name, image_url, url, ingredients, onClick, isLocked }) => {
+const RecipeCard = ({ index, title, image, canonical_url, ingredients, onClick, isLocked }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
@@ -29,10 +29,10 @@ const RecipeCard = ({ index, name, image_url, url, ingredients, onClick, isLocke
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <img src={image_url} alt={name} className="w-full h-48 object-cover" />
-      <a href={url} target="_blank" rel="noopener noreferrer">
+      <img src={image} alt={title} className="w-full h-48 object-cover" />
+      <a href={canonical_url} target="_blank" rel="noopener noreferrer">
         <div className="p-4 text-center">
-          <h3 className="link text-xl font-semibold">{name}</h3>
+          <h3 className="link text-xl font-semibold">{title}</h3>
         </div>
       </a>
       {isLocked && <div className="lock-indicator">🔒</div>}

@@ -1,7 +1,7 @@
 // Shopping list filters
 
 // List of substrings to completely omit
-export const hardFilterSubstring = ["to taste", "water", "salt", "pepper", "sugar", "flour"];
+export const hardFilterSubstring = ["to taste", "salt", "pepper", "sugar"];
 // List of substrings probably already have
 export const pantryFilterSubstring = [
   "oil", "butter", "cornstarch",

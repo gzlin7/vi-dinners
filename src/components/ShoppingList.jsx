@@ -2,6 +2,33 @@ import {React, forwardRef, useImperativeHandle} from "react";
 import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "../lib/groceryFilters.js"
 
 const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
+  function parseIngredient(ingredient) {
+    return ingredient.replace(/^\d+\s+\S+\s+/, '');
+  };
+
+  function consolidateIngredients(ingredients) {
+    const ingredientMap = new Map();
+    const occurrenceMap = new Map();
+
+    ingredients.forEach(item => {
+      const match = item.match(/^(\d+)\s+(\S+)\s+(.*)$/);
+      if (match) {
+        const quantity = parseInt(match[1], 10);
+        const unit = match[2];
+        const name = match[3];
+        const key = `${unit} ${name}`;
+
+        ingredientMap.set(key, (ingredientMap.get(key) || 0) + quantity);
+        occurrenceMap.set(key, (occurrenceMap.get(key) || 0) + 1);
+      }
+    });
+
+    return Array.from(ingredientMap.entries()).map(([key, quantity]) => {
+      const occurrences = occurrenceMap.get(key);
+      return occurrences > 1 ? `${quantity} ${key} (x${occurrences})` : `${quantity} ${key}`;
+    });
+  }
+
   // Extract Ingredients
   const ingredientSet = new Set();
   selectedRecipes.forEach((recipe) => {
@@ -14,7 +41,11 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
         }
       });
   });
-  const ingredients = Array.from(ingredientSet);
+
+  // Alpha sort ingredients and consolidate dupes
+  var ingredients = Array.from(ingredientSet);
+  ingredients = consolidateIngredients(ingredients);
+  ingredients.sort((a, b) => (parseIngredient(a).localeCompare(parseIngredient(b))));
 
   // Separate pantry ingredients
   let groceryIngredients = ingredients.filter(ingredient => {

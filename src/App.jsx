@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import RecipeCards from "./components/RecipeCards";
 import ShoppingList from "./components/ShoppingList";
-import recipes from "./lib/data/allrecipes_mains.json";
+import recipes from "./lib/data/hello-fresh.json";
 import {generatePdf} from "./lib/exportPdf.js";
 
 function App() {

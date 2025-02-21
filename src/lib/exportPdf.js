@@ -16,19 +16,19 @@ export const generatePdf = (selectedRecipes, groceryItemsMap) => {
   let yPosition = 50;
   let xPosition = 20;
   selectedRecipes.forEach((item, index) => {
-    const text = `${index + 1}. ${item.name}`;
+    const text = `${index + 1}. ${item.title}`;
     doc.text(text, xPosition, yPosition);
     // TODO: jump to page link if I decide to parse the recipes into the packet
-    // doc.link(xPosition, yPosition - 2, doc.getTextWidth(item.url), 10, {
+    // doc.link(xPosition, yPosition - 2, doc.getTextWidth(item.canonical_url), 10, {
     //   pageNumber: index + 2,
     // });
     yPosition += 10;
 
     // url link
     doc.setTextColor(0, 0, 255); // Set link color to blue
-    doc.text(item.url, xPosition, yPosition);
-    doc.link(xPosition, yPosition - 2, doc.getTextWidth(item.url), 10, {
-      url: item.url,
+    doc.text(item.canonical_url, xPosition, yPosition);
+    doc.link(xPosition, yPosition - 2, doc.getTextWidth(item.canonical_url), 10, {
+      url: item.canonical_url,
     });
     doc.setTextColor(0, 0, 0);
     yPosition += 10;
@@ -39,11 +39,6 @@ export const generatePdf = (selectedRecipes, groceryItemsMap) => {
   doc.setFontSize(headerFontSize);
   doc.text("Shopping List", 20, 20);
   doc.setFontSize(bodyFontSize);
-  doc.text(
-    "Some fractional numbers don't print to pdf, so they may be missing. Refer to site or recipe.",
-    20,
-    30
-  );
 
   let maxLeftWidth = 85;
   const renderGrocerySection = (section) => {
@@ -68,9 +63,9 @@ export const generatePdf = (selectedRecipes, groceryItemsMap) => {
   };
   let left_col = ["Meat", "Dairy", "Dry Grains"];
   let right_col = ["Produce", "Canned Goods"];
-  yPosition = 40;
+  yPosition = 30;
   left_col.map((section) => renderGrocerySection(section));
-  yPosition = 40;
+  yPosition = 30;
   xPosition = maxLeftWidth + 25;
   right_col.map((section) => renderGrocerySection(section));
 
