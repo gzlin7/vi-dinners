@@ -3,7 +3,7 @@ import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "
 
 const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
   function parseIngredient(ingredient) {
-    return ingredient.replace(/^\d+\s+\S+\s+/, '');
+    return ingredient.replace(/^[\d.]+\s+\S+\s+/, '');
   };
 
   function consolidateIngredients(ingredients) {
@@ -11,9 +11,9 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
     const occurrenceMap = new Map();
 
     ingredients.forEach(item => {
-      const match = item.match(/^(\d+)\s+(\S+)\s+(.*)$/);
+      const match = item.match(/^([\d.]+)\s+(\S+)\s+(.*)$/);
       if (match) {
-        const quantity = parseInt(match[1], 10);
+        const quantity = parseFloat(match[1]);
         const unit = match[2];
         const name = match[3];
         const key = `${unit} ${name}`;
@@ -25,7 +25,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
 
     return Array.from(ingredientMap.entries()).map(([key, quantity]) => {
       const occurrences = occurrenceMap.get(key);
-      return occurrences > 1 ? `${quantity} ${key} (x${occurrences})` : `${quantity} ${key}`;
+      return occurrences > 1 ? `${quantity} ${key} (${occurrences} recipes)` : `${quantity} ${key}`;
     });
   }
 
