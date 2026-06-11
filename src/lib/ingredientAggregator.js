@@ -105,8 +105,13 @@ export function aggregateIngredients(recipes, { shouldOmit = () => false } = {})
       unitTotals.set(unit, (unitTotals.get(unit) || 0) + quantity);
     });
 
+    // "unit" is HelloFresh's filler measure word ("2 unit Lime") — drop it
     const amounts = Array.from(unitTotals.entries())
-      .map(([unit, total]) => `${formatQuantity(total)} ${unit}`)
+      .map(([unit, total]) =>
+        unit === "unit"
+          ? formatQuantity(total)
+          : `${formatQuantity(total)} ${unit}`
+      )
       .join(" + ");
 
     const recipeCount = new Set(

@@ -94,7 +94,8 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
             <ul className="list-none pl-4 text-sm text-gray-600">
               {item.contributions.map((c, i) => (
                 <li key={i}>
-                  ↳ {c.original} — {c.recipeTitle}
+                  ↳ {c.original.replace(/^([\d.]+)\s+unit\s+/, "$1 ")} —{" "}
+                  {c.recipeTitle}
                 </li>
               ))}
             </ul>
