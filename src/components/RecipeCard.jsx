@@ -25,17 +25,23 @@ const RecipeCard = ({ index, title, image, canonical_url, ingredients, onClick, 
       key={index}
       className={`card ${isLocked ? "locked" : ""
         } bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition`}
-      onClick={() => onClick(index)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <img src={image} alt={title} className="w-full h-48 object-cover" />
+      <div
+        className="image-wrap relative cursor-pointer"
+        onClick={() => onClick(index)}
+      >
+        <img src={image} alt={title} className="w-full h-48 object-cover" />
+        <div className={`lock-overlay ${isLocked ? "locked" : ""}`}>
+          <span className="lock-icon">{isLocked ? "🔒" : "🔓"}</span>
+        </div>
+      </div>
       <a href={canonical_url} target="_blank" rel="noopener noreferrer">
         <div className="p-4 text-center">
           <h3 className="link text-xl font-semibold">{title}</h3>
         </div>
       </a>
-      {isLocked && <div className="lock-indicator">🔒</div>}
       {/* Tooltip using Portal to prevent cropping */}
       {showTooltip &&
         createPortal(

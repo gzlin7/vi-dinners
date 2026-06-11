@@ -85,16 +85,32 @@ button:active {
   /* Slight scale when clicked */
 }
 
-.lock-indicator {
+/* Lock overlay: open lock fades in over the image on hover (click to lock);
+   once locked, the closed-lock overlay stays visible. */
+.lock-overlay {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
-  color: #ff6347;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
 }
 
-.card.locked {
-  opacity: 0.5;
-  /* Make locked recipes appear faded */
-  position: relative;
+.lock-overlay .lock-icon {
+  font-size: 48px;
+  transform: scale(0.8);
+  transition: transform 0.2s ease-in-out;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+
+.image-wrap:hover .lock-overlay,
+.lock-overlay.locked {
+  opacity: 1;
+}
+
+.image-wrap:hover .lock-overlay .lock-icon,
+.lock-overlay.locked .lock-icon {
+  transform: scale(1);
 }
