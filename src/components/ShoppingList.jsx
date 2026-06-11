@@ -75,40 +75,50 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
   );
 
   return (
-    <div className="shopping-list grid grid-cols-2 gap-6">
-      {/* Left column: Grocery ingredients */}
-      <div className="original-list">
-        <h3 className="text-xl font-bold">Grocery list</h3>
-        <p className="text-sm text-gray-500">
-          Items marked “(n recipes)” are shared — click one to see each
-          recipe’s portion.
-        </p>
-        {/* Render each subsection */}
-        {Object.entries(groceryDeptDict).map(([key, value]) => (
-          <div key={key} className="filter-section mt-4">
-            <h4 className="font-bold">{key}</h4>
-            <ul className="list-disc pl-4">
-              {value.length > 0 ? (
-                value.map(renderItem)
-              ) : (
-                <li>No ingredients in this category</li>
-              )}
-            </ul>
-          </div>
-        ))}
-      </div>
+    <div className="shopping-list w-full max-w-[1600px] mx-auto mt-6">
+      <h3 className="text-xl font-bold">Grocery list</h3>
+      <p className="text-sm text-gray-500">
+        Items marked “(n recipes)” are shared — click one to see each
+        recipe’s portion.
+      </p>
 
-      {/* Right column: Pantry ingredients */}
-      <div className="filtered-list">
-        <h3 className="text-xl font-bold">Double check pantry </h3>
-        <ul className="list-disc pl-4">
-          <li>I always assume you have salt, pepper, sugar, and flour</li>
-          {pantryItems.length > 0 ? (
-            pantryItems.map(renderItem)
-          ) : (
-            <li>No additional ingredients in this category</li>
-          )}
-        </ul>
+      {/* Department bins: responsive grid, each bin scrolls if its list is long */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4 items-start">
+        {Object.entries(groceryDeptDict)
+          .filter(([, deptItems]) => deptItems.length > 0)
+          .map(([dept, deptItems]) => (
+            <div key={dept} className="bg-white rounded-2xl shadow-md p-4 text-left">
+              <h4 className="font-bold flex justify-between border-b border-gray-200 pb-1 mb-2">
+                {dept}
+                <span className="text-sm font-normal text-gray-400">
+                  {deptItems.length}
+                </span>
+              </h4>
+              <ul className="list-disc pl-4 pr-1 max-h-56 overflow-y-auto">
+                {deptItems.map(renderItem)}
+              </ul>
+            </div>
+          ))}
+
+        {/* Pantry bin */}
+        <div className="bg-amber-50 rounded-2xl shadow-md p-4 text-left">
+          <h4 className="font-bold flex justify-between border-b border-amber-200 pb-1 mb-2">
+            Double check pantry
+            <span className="text-sm font-normal text-gray-400">
+              {pantryItems.length}
+            </span>
+          </h4>
+          <p className="text-xs text-gray-500 mb-2">
+            I always assume you have salt, pepper, sugar, and flour.
+          </p>
+          <ul className="list-disc pl-4 pr-1 max-h-56 overflow-y-auto">
+            {pantryItems.length > 0 ? (
+              pantryItems.map(renderItem)
+            ) : (
+              <li>No additional ingredients in this category</li>
+            )}
+          </ul>
+        </div>
       </div>
     </div>
   );
