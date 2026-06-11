@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
 @import "tailwindcss";
 
 /* Ensure full-page layout and prevent horizontal scrolling */
@@ -9,12 +10,19 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   /* Prevents unwanted side-scrolling */
-  background-color: #f3f4f6;
-  /* Light gray background */
   font-family: 'Inter', sans-serif;
   /* Clean and modern font */
   color: #333;
   /* Dark gray text */
+  /* Warm paper tone — enough contrast for white polaroid frames and the
+     translucent tape strips to read against it */
+  background-color: #efe7d8;
+}
+
+/* Handwritten accents (headers and titles — list text stays sans for
+   scanning) */
+.handwritten {
+  font-family: 'Patrick Hand', cursive;
 }
 
 /* Smooth scrolling behavior */
@@ -85,8 +93,8 @@ button:active {
   /* Slight scale when clicked */
 }
 
-/* Lock overlay: open lock fades in over the image on hover (click to lock);
-   once locked, the closed-lock overlay stays visible. */
+/* Lock overlay: open lock fades in over the photo on hover (click to lock);
+   a locked recipe keeps a closed-lock overlay. */
 .lock-overlay {
   position: absolute;
   inset: 0;
@@ -94,23 +102,80 @@ button:active {
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.35);
+  color: #fff;
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 }
 
 .lock-overlay .lock-icon {
-  font-size: 48px;
+  width: 42px;
+  height: 42px;
   transform: scale(0.8);
   transition: transform 0.2s ease-in-out;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.55));
 }
 
-.image-wrap:hover .lock-overlay,
+.card:hover .lock-overlay,
 .lock-overlay.locked {
   opacity: 1;
 }
 
-.image-wrap:hover .lock-overlay .lock-icon,
+.card:hover .lock-overlay .lock-icon,
 .lock-overlay.locked .lock-icon {
   transform: scale(1);
+}
+
+/* Recipe cards as photos pinned to the board: white polaroid frame, slight
+   alternating tilt that straightens on hover */
+.card.polaroid {
+  border-radius: 3px;
+  padding: 10px 10px 0;
+}
+
+.card.polaroid .image-wrap {
+  outline: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Grocery bins as post-it notes: squared corners, paper shadow, a strip of
+   tape, and a slight tilt */
+.postit {
+  position: relative;
+  border-radius: 2px;
+  box-shadow: 2px 5px 9px rgba(60, 35, 10, 0.3);
+}
+
+/* Tape stays fully inside the post-it's box: anything overflowing the top
+   edge gets painted at the bottom of the previous CSS column ("phantom
+   tape slivers") */
+.postit::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 84px;
+  height: 18px;
+  margin-left: -42px;
+  background: rgba(255, 255, 252, 0.55);
+  border-left: 1px dashed rgba(0, 0, 0, 0.06);
+  border-right: 1px dashed rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transform: rotate(-2deg);
+}
+
+/* Tilt the paper but counter-rotate its contents so text stays level
+   (the tape ::before keeps the box's tilt, as it should) */
+.postit:nth-child(odd) {
+  transform: rotate(-0.6deg);
+}
+
+.postit:nth-child(odd) > * {
+  transform: rotate(0.6deg);
+}
+
+.postit:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+
+.postit:nth-child(even) > * {
+  transform: rotate(-0.5deg);
 }

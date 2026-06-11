@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { shouldOmitIngredient, pantryFilterSubstring, classifyIngredient, groceryDeptOrder } from "../lib/groceryFilters.js";
 import { aggregateIngredients } from "../lib/ingredientAggregator.js";
 
@@ -35,6 +35,48 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
     });
   const toggleExpanded = toggleIn(setExpandedKeys);
   const toggleChecked = toggleIn(setCheckedKeys);
+
+  // Bins that sit alone in their CSS column grow instead of scrolling beside
+  // empty space. CSS multicol doesn't expose column placement, so measure it:
+  // with break-inside-avoid each bin's offsetLeft identifies its column. We
+  // measure with all bins capped (the baseline layout) and only re-measure on
+  // resize/recipe change, so uncapping can't feedback-loop the balancer.
+  const binsRef = useRef(null);
+  const [lonelyDepts, setLonelyDepts] = useState(() => new Set());
+  useEffect(() => {
+    let raf;
+    const measure = () => {
+      const el = binsRef.current;
+      if (!el) return;
+      const perColumn = new Map();
+      for (const child of el.children) {
+        const left = Math.round(child.offsetLeft);
+        perColumn.set(left, (perColumn.get(left) || 0) + 1);
+      }
+      const lonely = new Set();
+      for (const child of el.children) {
+        if (perColumn.get(Math.round(child.offsetLeft)) === 1) {
+          lonely.add(child.dataset.dept);
+        }
+      }
+      setLonelyDepts(lonely);
+    };
+    const remeasure = () => {
+      setLonelyDepts(new Set()); // re-cap first so we measure the baseline
+      raf = requestAnimationFrame(() => {
+        raf = requestAnimationFrame(measure);
+      });
+    };
+    remeasure();
+    window.addEventListener("resize", remeasure);
+    return () => {
+      window.removeEventListener("resize", remeasure);
+      cancelAnimationFrame(raf);
+    };
+  }, [selectedRecipes]);
+
+  const listMaxHeight = (dept) =>
+    lonelyDepts.has(dept) ? "max-h-[80vh]" : "max-h-56";
 
   // Aggregate ingredients across recipes (dedupes same ingredient, sums
   // quantities, keeps per-recipe contributions). Already alpha-sorted.
@@ -110,15 +152,11 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
 
   return (
     <div className="shopping-list w-full max-w-[1600px] mx-auto mt-6">
-      <h3 className="text-xl font-bold">Grocery list</h3>
-      <p className="text-sm text-gray-500">
-        Items marked <strong>(n)</strong> are shared by n recipes — click one
-        to see each recipe’s portion.
-      </p>
+      <h3 className="handwritten text-4xl font-bold">Grocery List</h3>
 
       {/* Department bins: masonry-style columns so bins pack by their own
           height instead of grid rows reserving the tallest bin's height */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4">
+      <div ref={binsRef} className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4">
         {Object.entries(groceryDeptDict)
           .filter(([, deptItems]) => deptItems.length > 0)
           .map(([dept, deptItems]) => {
@@ -129,17 +167,18 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
             return (
             <div
               key={dept}
-              className={`${style.bin} rounded-2xl shadow-md p-4 text-left break-inside-avoid mb-4`}
+              data-dept={dept}
+              className={`${style.bin} postit p-4 text-left break-inside-avoid mb-4`}
             >
-              <h4 className={`font-bold flex justify-between border-b ${style.border} pb-1 mb-2`}>
+              <h4 className={`handwritten text-2xl flex justify-between border-b ${style.border} pb-1 mb-2`}>
                 <span>
                   {style.emoji} {dept}
                 </span>
-                <span className="text-sm font-normal text-gray-400">
+                <span className="text-gray-400">
                   {remaining === 0 ? "✓" : remaining}
                 </span>
               </h4>
-              <ul className="pr-1 max-h-56 overflow-y-auto space-y-1">
+              <ul className={`pr-1 ${listMaxHeight(dept)} overflow-y-auto space-y-1`}>
                 {deptItems.map(renderItem)}
               </ul>
             </div>
@@ -147,17 +186,20 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
           })}
 
         {/* Pantry bin */}
-        <div className="bg-amber-50 rounded-2xl shadow-md p-4 text-left break-inside-avoid mb-4">
-          <h4 className="font-bold flex justify-between border-b border-amber-200 pb-1 mb-2">
+        <div
+          data-dept="pantry"
+          className="bg-amber-50 postit p-4 text-left break-inside-avoid mb-4"
+        >
+          <h4 className="handwritten text-2xl flex justify-between border-b border-amber-200 pb-1 mb-2">
             <span>🧂 Double check pantry</span>
-            <span className="text-sm font-normal text-gray-400">
+            <span className="text-gray-400">
               {pantryRemaining === 0 ? "✓" : pantryRemaining}
             </span>
           </h4>
           <p className="text-xs text-gray-500 mb-2">
             I always assume you have salt, pepper, sugar, and flour.
           </p>
-          <ul className="pr-1 max-h-56 overflow-y-auto space-y-1">
+          <ul className={`pr-1 ${listMaxHeight("pantry")} overflow-y-auto space-y-1`}>
             {pantryItems.length > 0 ? (
               pantryItems.map(renderItem)
             ) : (
