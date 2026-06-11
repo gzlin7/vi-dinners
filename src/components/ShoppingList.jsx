@@ -20,9 +20,11 @@ const fallbackStyle = { emoji: "🛒", bin: "bg-white", border: "border-gray-200
 const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
   // Keys of items expanded to show per-recipe portioning
   const [expandedKeys, setExpandedKeys] = useState(new Set());
+  // Keys of items checked off while shopping
+  const [checkedKeys, setCheckedKeys] = useState(new Set());
 
-  const toggleExpanded = (key) => {
-    setExpandedKeys((prev) => {
+  const toggleIn = (setState) => (key) =>
+    setState((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
         next.delete(key);
@@ -31,7 +33,8 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
       }
       return next;
     });
-  };
+  const toggleExpanded = toggleIn(setExpandedKeys);
+  const toggleChecked = toggleIn(setCheckedKeys);
 
   // Aggregate ingredients across recipes (dedupes same ingredient, sums
   // quantities, keeps per-recipe contributions). Already alpha-sorted.
@@ -68,26 +71,38 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
       ),
   }));
 
-  const renderItem = (item) => (
-    <li
-      key={item.key}
-      onClick={() => item.recipeCount > 1 && toggleExpanded(item.key)}
-      className={item.recipeCount > 1 ? "cursor-pointer hover:text-[#ff6347]" : ""}
-      title={item.recipeCount > 1 ? "Click to see portions per recipe" : undefined}
-    >
-      {item.display}
-      {item.recipeCount > 1 && <strong> ({item.recipeCount})</strong>}
-      {expandedKeys.has(item.key) && (
-        <ul className="list-none pl-4 text-sm text-gray-600">
-          {item.contributions.map((c, i) => (
-            <li key={i}>
-              ↳ {c.original} — {c.recipeTitle}
-            </li>
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+  const renderItem = (item) => {
+    const checked = checkedKeys.has(item.key);
+    return (
+      <li key={item.key} className="flex items-start gap-2">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => toggleChecked(item.key)}
+          className="mt-1 shrink-0 cursor-pointer accent-[#187927]"
+        />
+        <div className={checked ? "line-through text-gray-400" : ""}>
+          <span
+            onClick={() => item.recipeCount > 1 && toggleExpanded(item.key)}
+            className={item.recipeCount > 1 ? "cursor-pointer hover:text-[#ff6347]" : ""}
+            title={item.recipeCount > 1 ? "Click to see portions per recipe" : undefined}
+          >
+            {item.display}
+            {item.recipeCount > 1 && <strong> ({item.recipeCount})</strong>}
+          </span>
+          {expandedKeys.has(item.key) && (
+            <ul className="list-none pl-4 text-sm text-gray-600">
+              {item.contributions.map((c, i) => (
+                <li key={i}>
+                  ↳ {c.original} — {c.recipeTitle}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    );
+  };
 
   return (
     <div className="shopping-list w-full max-w-[1600px] mx-auto mt-6">
@@ -117,7 +132,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
                   {deptItems.length}
                 </span>
               </h4>
-              <ul className="list-disc pl-4 pr-1 max-h-56 overflow-y-auto">
+              <ul className="pr-1 max-h-56 overflow-y-auto space-y-1">
                 {deptItems.map(renderItem)}
               </ul>
             </div>
@@ -135,7 +150,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
           <p className="text-xs text-gray-500 mb-2">
             I always assume you have salt, pepper, sugar, and flour.
           </p>
-          <ul className="list-disc pl-4 pr-1 max-h-56 overflow-y-auto">
+          <ul className="pr-1 max-h-56 overflow-y-auto space-y-1">
             {pantryItems.length > 0 ? (
               pantryItems.map(renderItem)
             ) : (
