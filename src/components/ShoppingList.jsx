@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { hardFilterSubstring, pantryFilterSubstring, groceryDeptFilters } from "../lib/groceryFilters.js";
+import { shouldOmitIngredient, pantryFilterSubstring, classifyIngredient, groceryDeptOrder } from "../lib/groceryFilters.js";
 import { aggregateIngredients } from "../lib/ingredientAggregator.js";
 
 const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
@@ -21,27 +21,22 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
   // Aggregate ingredients across recipes (dedupes same ingredient, sums
   // quantities, keeps per-recipe contributions). Already alpha-sorted.
   const items = aggregateIngredients(selectedRecipes, {
-    omitSubstrings: hardFilterSubstring,
+    shouldOmit: shouldOmitIngredient,
   });
 
   // Separate pantry ingredients
   const matchesPantry = (item) =>
     pantryFilterSubstring.some((substring) => item.key.includes(substring));
-  let groceryItems = items.filter((item) => !matchesPantry(item));
+  const groceryItems = items.filter((item) => !matchesPantry(item));
   const pantryItems = items.filter(matchesPantry);
 
-  // Create a filtered list for each grocery dept
-  const groceryDeptDict = {};
-  for (const gf of groceryDeptFilters) {
-    groceryDeptDict[gf.name] = groceryItems.filter((item) =>
-      gf.keywords.some((substring) => item.key.includes(substring))
-    );
-    // remove from master grocery
-    groceryItems = groceryItems.filter(
-      (item) => !gf.keywords.some((substring) => item.key.includes(substring))
-    );
-  }
-  groceryDeptDict["Miscellaneous"] = groceryItems;
+  // Bucket by department, in store-walk display order
+  const groceryDeptDict = Object.fromEntries(
+    groceryDeptOrder.map((dept) => [dept, []])
+  );
+  groceryItems.forEach((item) => {
+    groceryDeptDict[classifyIngredient(item.key)].push(item);
+  });
 
   useImperativeHandle(ref, () => ({
     // PDF export consumes plain strings per department

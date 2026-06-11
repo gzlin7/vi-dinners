@@ -76,17 +76,15 @@ function formatQuantity(quantity) {
  * Same ingredient with different units stays one item with the amounts
  * joined by " + " (no cross-unit conversion).
  */
-export function aggregateIngredients(recipes, { omitSubstrings = [] } = {}) {
+export function aggregateIngredients(recipes, { shouldOmit = () => false } = {}) {
   const itemMap = new Map();
 
   recipes.forEach((recipe) => {
     if (!recipe) return;
     recipe.ingredients.split(";").forEach((raw) => {
-      const lower = raw.toLowerCase();
-      if (omitSubstrings.some((s) => lower.includes(s))) return;
-
       const { quantity, unit, name } = parseIngredient(raw);
       const key = normalizeName(name);
+      if (shouldOmit(raw, key)) return;
       if (!itemMap.has(key)) {
         itemMap.set(key, { key, displayName: name, contributions: [] });
       }

@@ -61,8 +61,23 @@ export const generatePdf = (selectedRecipes, groceryItemsMap) => {
       });
     }
   };
-  let left_col = ["Meat", "Dairy", "Dry Grains"];
-  let right_col = ["Produce", "Canned Goods"];
+  // Split departments into two roughly equal columns by item count,
+  // preserving the store-walk order from getGroceries()
+  const sections = Object.entries(groceryItemsMap).filter(
+    ([, items]) => items.length > 0
+  );
+  const totalItems = sections.reduce((n, [, items]) => n + items.length, 0);
+  let leftCount = 0;
+  const left_col = [];
+  const right_col = [];
+  sections.forEach(([section, items]) => {
+    if (leftCount < totalItems / 2) {
+      left_col.push(section);
+      leftCount += items.length;
+    } else {
+      right_col.push(section);
+    }
+  });
   yPosition = 30;
   left_col.map((section) => renderGrocerySection(section));
   yPosition = 30;
