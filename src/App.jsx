@@ -52,23 +52,30 @@ function App() {
   return (
     <div className="w-full min-h-screen bg-gray-100 p-6">
 
-      <h1 className="text-3xl font-bold text-center mb-6">🍲 VI Dinners 🍽️</h1>
-
-      {/* Slider to control number of recipes */}
-      <div className="w-full flex justify-center mt-4">
-        <label className="font-semibold mr-2">Number of recipes:</label>
-        <input
-          type="range"
-          min="1"
-          max="6"
-          value={numDisplayedRecipes}
-          onChange={(e) => setNumDisplayedRecipes(parseInt(e.target.value))}
-          className="w-40"
-        />
-        <span className="ml-2 font-bold">{numDisplayedRecipes}</span>
+      {/* Title + instructions share a row, stack when narrow */}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-x-6 gap-y-1">
+        <h1 className="text-3xl font-bold whitespace-nowrap">🍲 VI Dinners 🍽️</h1>
+        <p className="text-gray-600">
+          Click on a recipe's image to lock it. Click on the recipe title to
+          visit its website.
+        </p>
       </div>
 
-      <div className="w-full flex justify-center mt-4">
+      {/* Slider + action buttons share a row, stack when narrow */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-x-8 gap-y-3 mt-4">
+        <div className="flex items-center">
+          <label className="font-semibold mr-2">Number of recipes:</label>
+          <input
+            type="range"
+            min="1"
+            max="6"
+            value={numDisplayedRecipes}
+            onChange={(e) => setNumDisplayedRecipes(parseInt(e.target.value))}
+            className="w-40"
+          />
+          <span className="ml-2 font-bold">{numDisplayedRecipes}</span>
+        </div>
+
         <div className="flex gap-2">
           <button
             onClick={randomizeRecipes}
@@ -85,8 +92,6 @@ function App() {
           </button>
         </div>
       </div>
-
-      <h1 className="text-center">Click on a recipe's image to lock it. Click on the recipe title to visit its website.</h1 >
 
       <RecipeCards
         recipes={selectedRecipes}
