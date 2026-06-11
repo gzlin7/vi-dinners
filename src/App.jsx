@@ -27,7 +27,7 @@ function App() {
       } else {
         // could have dupes...
         newSelectedRecipes.push(
-          recipes[Math.floor(Math.random() * numTotalRecipes) - 1]
+          recipes[Math.floor(Math.random() * numTotalRecipes)]
         );
       }
     }
