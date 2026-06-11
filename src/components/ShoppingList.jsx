@@ -59,7 +59,11 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
       Object.fromEntries(
         Object.entries(groceryDeptDict).map(([dept, deptItems]) => [
           dept,
-          deptItems.map((item) => item.display),
+          deptItems.map((item) =>
+            item.recipeCount > 1
+              ? `${item.display} (${item.recipeCount})`
+              : item.display
+          ),
         ])
       ),
   }));
@@ -72,6 +76,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
       title={item.recipeCount > 1 ? "Click to see portions per recipe" : undefined}
     >
       {item.display}
+      {item.recipeCount > 1 && <strong> ({item.recipeCount})</strong>}
       {expandedKeys.has(item.key) && (
         <ul className="list-none pl-4 text-sm text-gray-600">
           {item.contributions.map((c, i) => (
@@ -88,8 +93,8 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
     <div className="shopping-list w-full max-w-[1600px] mx-auto mt-6">
       <h3 className="text-xl font-bold">Grocery list</h3>
       <p className="text-sm text-gray-500">
-        Items marked “(n recipes)” are shared — click one to see each
-        recipe’s portion.
+        Items marked <strong>(n)</strong> are shared by n recipes — click one
+        to see each recipe’s portion.
       </p>
 
       {/* Department bins: masonry-style columns so bins pack by their own

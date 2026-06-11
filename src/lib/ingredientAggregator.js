@@ -113,8 +113,9 @@ export function aggregateIngredients(recipes, { shouldOmit = () => false } = {})
       item.contributions.map((c) => c.recipeTitle)
     ).size;
 
-    let display = amounts ? `${amounts} ${item.displayName}` : item.displayName;
-    if (recipeCount > 1) display += ` (${recipeCount} recipes)`;
+    const display = amounts
+      ? `${amounts} ${item.displayName}`
+      : item.displayName;
 
     return { ...item, display, recipeCount };
   });
