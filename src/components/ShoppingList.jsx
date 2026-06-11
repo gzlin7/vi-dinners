@@ -1,6 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { shouldOmitIngredient, pantryFilterSubstring, classifyIngredient, groceryDeptOrder } from "../lib/groceryFilters.js";
 import { aggregateIngredients, displayUnit, formatQuantity } from "../lib/ingredientAggregator.js";
+import { spiceBlends } from "../lib/spiceBlends.js";
+import BlendModal from "./BlendModal.jsx";
 
 // Per-department bin color + icon (full literal class names so Tailwind
 // generates them)
@@ -22,6 +24,8 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
   const [expandedKeys, setExpandedKeys] = useState(new Set());
   // Keys of items checked off while shopping
   const [checkedKeys, setCheckedKeys] = useState(new Set());
+  // Spice blend whose composition is shown in the modal
+  const [openBlendKey, setOpenBlendKey] = useState(null);
 
   const toggleIn = (setState) => (key) =>
     setState((prev) => {
@@ -120,6 +124,12 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
 
   const renderItem = (item) => {
     const checked = checkedKeys.has(item.key);
+    // Known proprietary blends render the name as a link to a composition
+    // pop-up. item.display always ends with displayName.
+    const blend = spiceBlends[item.key];
+    const amountPrefix = blend
+      ? item.display.slice(0, item.display.length - item.displayName.length)
+      : null;
     return (
       <li key={item.key} className="flex items-start gap-2">
         <input
@@ -134,7 +144,23 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
             className={item.recipeCount > 1 ? "cursor-pointer hover:text-[#ff6347]" : ""}
             title={item.recipeCount > 1 ? "Click to see portions per recipe" : undefined}
           >
-            {item.display}
+            {blend ? (
+              <>
+                {amountPrefix}
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenBlendKey(item.key);
+                  }}
+                  className="cursor-pointer underline decoration-dotted underline-offset-2 hover:text-[#c4704f]"
+                  title="What's in this blend?"
+                >
+                  {item.displayName}
+                </span>
+              </>
+            ) : (
+              item.display
+            )}
             {item.recipeCount > 1 && <strong> ({item.recipeCount})</strong>}
           </span>
           {expandedKeys.has(item.key) && (
@@ -159,6 +185,11 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
   return (
     <div className="shopping-list w-full max-w-[1600px] mx-auto mt-6">
       <h3 className="handwritten text-4xl font-bold">Grocery List</h3>
+
+      <BlendModal
+        blend={openBlendKey ? spiceBlends[openBlendKey] : null}
+        onClose={() => setOpenBlendKey(null)}
+      />
 
       {/* Department bins: masonry-style columns so bins pack by their own
           height instead of grid rows reserving the tallest bin's height */}
