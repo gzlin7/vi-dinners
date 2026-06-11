@@ -33,6 +33,19 @@ export function normalizeUnit(unit) {
   return unitSynonyms[u] || u;
 }
 
+// Known measure words, used to strip strays like "unit Olive Oil" where the
+// data has a unit but no quantity
+const knownUnits = new Set([
+  "unit", "box", "tablespoon", "teaspoon", "ounce", "cup", "clove", "jar",
+  "can", "pound", "gram", "kilogram", "milliliter", "liter", "piece",
+  "slice", "bunch", "head", "pinch", "dash",
+]);
+
+const unitAbbrev = { ounce: "oz" };
+export function displayUnit(unit) {
+  return unitAbbrev[unit] || unit;
+}
+
 export function normalizeName(name) {
   return name
     .toLowerCase()
@@ -43,7 +56,9 @@ export function normalizeName(name) {
 }
 
 // Parses "0.25 cup Panko Breadcrumbs" -> { quantity, unit, name }.
-// Unmeasured ingredients ("Salt") parse to { quantity: null, unit: null, name }.
+// Some entries have a quantity but no unit word ("2 Garlic", "1 Shallot") —
+// those get unit null. Unmeasured ingredients ("Salt") parse to
+// { quantity: null, unit: null, name }.
 export function parseIngredient(raw) {
   const match = raw.trim().match(/^([\d.]+)\s+(\S+)\s+(.*)$/);
   if (match) {
@@ -53,11 +68,24 @@ export function parseIngredient(raw) {
       name: match[3].trim(),
     };
   }
+  const unitless = raw.trim().match(/^([\d.]+)\s+(.*)$/);
+  if (unitless) {
+    return {
+      quantity: parseFloat(unitless[1]),
+      unit: null,
+      name: unitless[2].trim(),
+    };
+  }
+  // Stray measure word with no quantity ("unit Olive Oil") — drop the unit
+  const stray = raw.trim().match(/^([a-z][\w]*)\s+(.*)$/);
+  if (stray && knownUnits.has(normalizeUnit(stray[1]))) {
+    return { quantity: null, unit: null, name: stray[2].trim() };
+  }
   return { quantity: null, unit: null, name: raw.trim() };
 }
 
 // Avoids float noise like 0.30000000000000004 in summed quantities.
-function formatQuantity(quantity) {
+export function formatQuantity(quantity) {
   return String(Math.round(quantity * 100) / 100);
 }
 
@@ -76,7 +104,10 @@ function formatQuantity(quantity) {
  * Same ingredient with different units stays one item with the amounts
  * joined by " + " (no cross-unit conversion).
  */
-export function aggregateIngredients(recipes, { shouldOmit = () => false } = {}) {
+export function aggregateIngredients(
+  recipes,
+  { shouldOmit = () => false, scale = 1 } = {}
+) {
   const itemMap = new Map();
 
   recipes.forEach((recipe) => {
@@ -90,8 +121,10 @@ export function aggregateIngredients(recipes, { shouldOmit = () => false } = {})
       }
       itemMap.get(key).contributions.push({
         recipeTitle: recipe.title,
-        quantity,
-        unit: unit ? normalizeUnit(unit) : null,
+        quantity: quantity === null ? null : quantity * scale,
+        // unitless counts ("2 Garlic") behave like HelloFresh's filler
+        // "unit", so they merge with "2 unit Garlic" style entries
+        unit: unit ? normalizeUnit(unit) : "unit",
         original: raw.trim(),
       });
     });
@@ -110,7 +143,7 @@ export function aggregateIngredients(recipes, { shouldOmit = () => false } = {})
       .map(([unit, total]) =>
         unit === "unit"
           ? formatQuantity(total)
-          : `${formatQuantity(total)} ${unit}`
+          : `${formatQuantity(total)} ${displayUnit(unit)}`
       )
       .join(" + ");
 

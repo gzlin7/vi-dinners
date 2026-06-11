@@ -11,6 +11,9 @@ function App() {
   const [lockedIndices, setlockedIndices] = useState([]);
   const numTotalRecipes = recipes.length;
   const [numDisplayedRecipes, setNumDisplayedRecipes] = useState(6);
+  // Servings to shop for; recipes are written for 2, so the shopping list
+  // scales quantities by portions/2
+  const [portions, setPortions] = useState(2);
 
   // Populate recipes on first load
   useEffect(() => {
@@ -54,8 +57,10 @@ function App() {
 
       <h1 className="handwritten text-5xl font-bold text-center">🍲 VI Dinners 🍽️</h1>
 
-      {/* Slider + action buttons share a row, stack when narrow */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-x-8 gap-y-3 mt-4">
+      {/* Controls share a row and wrap progressively as the window narrows
+          (sliders and buttons break onto their own lines instead of the
+          whole row jumping straight to a stack) */}
+      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mt-4">
         <div className="flex items-center">
           <label className="handwritten text-2xl mr-3">Number of recipes:</label>
           <input
@@ -69,7 +74,20 @@ function App() {
           <span className="handwritten text-3xl ml-3">{numDisplayedRecipes}</span>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex items-center">
+          <label className="handwritten text-2xl mr-3">Portions:</label>
+          <input
+            type="range"
+            min="2"
+            max="6"
+            value={portions}
+            onChange={(e) => setPortions(parseInt(e.target.value))}
+            className="w-40 accent-[#ef4444] cursor-pointer"
+          />
+          <span className="handwritten text-3xl ml-3">{portions}</span>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={randomizeRecipes}
             className="handwritten text-2xl px-6 py-1.5 bg-[#f97316] text-white rounded-sm shadow-[2px_4px_6px_rgba(60,35,10,0.3)] transition-all duration-200 ease-in-out hover:bg-[#ea580c] active:scale-95"
@@ -91,7 +109,11 @@ function App() {
         onCardClick={toggleLockRecipe}
         lockedIndices={lockedIndices}
       />
-        <ShoppingList ref={shoppingListRef}  selectedRecipes={selectedRecipes} />
+        <ShoppingList
+          ref={shoppingListRef}
+          selectedRecipes={selectedRecipes}
+          portions={portions}
+        />
     </div>
   );
 }

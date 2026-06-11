@@ -45,11 +45,12 @@ const RecipeCard = ({ index, title, image, canonical_url, nutrition, onClick, is
           </h3>
         </div>
       </a>
-      {/* Per-serving macros (only for recipes with scraped nutrition data) */}
+      {/* Macros from the scraped data, which is already per serving */}
       {nutrition && nutrition.calories != null && (
         <div className="px-4 pb-4 -mt-2 text-center text-sm text-gray-500">
           {nutrition.calories} kcal · {nutrition.protein_g}g protein ·{" "}
-          {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat
+          {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat{" "}
+          <span className="text-gray-400">(per serving)</span>
         </div>
       )}
     </div>

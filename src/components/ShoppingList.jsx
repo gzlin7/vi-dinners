@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { shouldOmitIngredient, pantryFilterSubstring, classifyIngredient, groceryDeptOrder } from "../lib/groceryFilters.js";
-import { aggregateIngredients } from "../lib/ingredientAggregator.js";
+import { aggregateIngredients, displayUnit, formatQuantity } from "../lib/ingredientAggregator.js";
 
 // Per-department bin color + icon (full literal class names so Tailwind
 // generates them)
@@ -17,7 +17,7 @@ const deptStyles = {
 };
 const fallbackStyle = { emoji: "🛒", bin: "bg-white", border: "border-gray-200" };
 
-const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
+const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
   // Keys of items expanded to show per-recipe portioning
   const [expandedKeys, setExpandedKeys] = useState(new Set());
   // Keys of items checked off while shopping
@@ -80,8 +80,10 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
 
   // Aggregate ingredients across recipes (dedupes same ingredient, sums
   // quantities, keeps per-recipe contributions). Already alpha-sorted.
+  // Quantities scale by portions; HelloFresh recipes are written for 2.
   const items = aggregateIngredients(selectedRecipes, {
     shouldOmit: shouldOmitIngredient,
+    scale: portions / 2,
   });
 
   // Separate pantry ingredients
@@ -139,8 +141,12 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
             <ul className="list-none pl-4 text-sm text-gray-600">
               {item.contributions.map((c, i) => (
                 <li key={i}>
-                  ↳ {c.original.replace(/^([\d.]+)\s+unit\s+/, "$1 ")} —{" "}
-                  {c.recipeTitle}
+                  ↳{" "}
+                  {c.quantity !== null &&
+                    `${formatQuantity(c.quantity)} ${
+                      c.unit !== "unit" ? `${displayUnit(c.unit)} ` : ""
+                    }`}
+                  {item.displayName} — {c.recipeTitle}
                 </li>
               ))}
             </ul>
@@ -168,8 +174,9 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
             <div
               key={dept}
               data-dept={dept}
-              className={`${style.bin} postit p-4 text-left break-inside-avoid mb-4`}
+              className="postit-wrap break-inside-avoid mb-4"
             >
+            <div className={`${style.bin} postit p-4 text-left`}>
               <h4 className={`handwritten text-2xl flex justify-between border-b ${style.border} pb-1 mb-2`}>
                 <span>
                   {style.emoji} {dept}
@@ -182,14 +189,16 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
                 {deptItems.map(renderItem)}
               </ul>
             </div>
+            </div>
             );
           })}
 
         {/* Pantry bin */}
         <div
           data-dept="pantry"
-          className="bg-amber-50 postit p-4 text-left break-inside-avoid mb-4"
+          className="postit-wrap break-inside-avoid mb-4"
         >
+        <div className="bg-amber-50 postit p-4 text-left">
           <h4 className="handwritten text-2xl flex justify-between border-b border-amber-200 pb-1 mb-2">
             <span>🧂 Double check pantry</span>
             <span className="text-gray-400">
@@ -206,6 +215,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
               <li>No additional ingredients in this category</li>
             )}
           </ul>
+        </div>
         </div>
       </div>
     </div>
