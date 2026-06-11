@@ -47,6 +47,9 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
     pantryFilterSubstring.some((substring) => item.key.includes(substring));
   const groceryItems = items.filter((item) => !matchesPantry(item));
   const pantryItems = items.filter(matchesPantry);
+  const pantryRemaining = pantryItems.filter(
+    (item) => !checkedKeys.has(item.key)
+  ).length;
 
   // Bucket by department, in store-walk display order
   const groceryDeptDict = Object.fromEntries(
@@ -120,6 +123,9 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
           .filter(([, deptItems]) => deptItems.length > 0)
           .map(([dept, deptItems]) => {
             const style = deptStyles[dept] || fallbackStyle;
+            const remaining = deptItems.filter(
+              (item) => !checkedKeys.has(item.key)
+            ).length;
             return (
             <div
               key={dept}
@@ -130,7 +136,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
                   {style.emoji} {dept}
                 </span>
                 <span className="text-sm font-normal text-gray-400">
-                  {deptItems.length}
+                  {remaining === 0 ? "✓" : remaining}
                 </span>
               </h4>
               <ul className="pr-1 max-h-56 overflow-y-auto space-y-1">
@@ -145,7 +151,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
           <h4 className="font-bold flex justify-between border-b border-amber-200 pb-1 mb-2">
             <span>🧂 Double check pantry</span>
             <span className="text-sm font-normal text-gray-400">
-              {pantryItems.length}
+              {pantryRemaining === 0 ? "✓" : pantryRemaining}
             </span>
           </h4>
           <p className="text-xs text-gray-500 mb-2">
