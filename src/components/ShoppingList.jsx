@@ -77,12 +77,16 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
         recipe’s portion.
       </p>
 
-      {/* Department bins: responsive grid, each bin scrolls if its list is long */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4 items-start">
+      {/* Department bins: masonry-style columns so bins pack by their own
+          height instead of grid rows reserving the tallest bin's height */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4">
         {Object.entries(groceryDeptDict)
           .filter(([, deptItems]) => deptItems.length > 0)
           .map(([dept, deptItems]) => (
-            <div key={dept} className="bg-white rounded-2xl shadow-md p-4 text-left">
+            <div
+              key={dept}
+              className="bg-white rounded-2xl shadow-md p-4 text-left break-inside-avoid mb-4"
+            >
               <h4 className="font-bold flex justify-between border-b border-gray-200 pb-1 mb-2">
                 {dept}
                 <span className="text-sm font-normal text-gray-400">
@@ -96,7 +100,7 @@ const ShoppingList = forwardRef(({ selectedRecipes }, ref) => {
           ))}
 
         {/* Pantry bin */}
-        <div className="bg-amber-50 rounded-2xl shadow-md p-4 text-left">
+        <div className="bg-amber-50 rounded-2xl shadow-md p-4 text-left break-inside-avoid mb-4">
           <h4 className="font-bold flex justify-between border-b border-amber-200 pb-1 mb-2">
             Double check pantry
             <span className="text-sm font-normal text-gray-400">
