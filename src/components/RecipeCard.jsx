@@ -1,6 +1,6 @@
 import React from "react";
 
-const RecipeCard = ({ index, title, image, canonical_url, onClick, isLocked }) => {
+const RecipeCard = ({ index, title, image, canonical_url, nutrition, onClick, isLocked }) => {
   return (
     <div
       key={index}
@@ -21,6 +21,13 @@ const RecipeCard = ({ index, title, image, canonical_url, onClick, isLocked }) =
           <h3 className="link text-xl font-semibold">{title}</h3>
         </div>
       </a>
+      {/* Per-serving macros (only for recipes with scraped nutrition data) */}
+      {nutrition && nutrition.calories != null && (
+        <div className="px-4 pb-4 -mt-2 text-center text-sm text-gray-500">
+          {nutrition.calories} kcal · {nutrition.protein_g}g protein ·{" "}
+          {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat
+        </div>
+      )}
     </div>
   );
 };

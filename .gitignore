@@ -10,6 +10,9 @@ lerna-debug.log*
 # Local AI agent context
 AGENTS.md
 
+# Scrape working output (merged into src/lib/data when complete)
+scripts/nutrition.jsonl
+
 node_modules
 dist
 dist-ssr
