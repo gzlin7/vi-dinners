@@ -18,7 +18,7 @@ const BlendModal = ({ blend, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="postit-wrap w-full max-w-sm"
+        className="postit-wrap no-tilt w-full max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="postit relative bg-amber-50 p-6 text-left">

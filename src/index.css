@@ -186,3 +186,10 @@ button:active {
 .postit-wrap:nth-child(even) .postit > * {
   transform: rotate(-0.5deg);
 }
+
+/* Opt-out for modals: tilted paper fights rectangular content like the
+   formula box */
+.postit-wrap.no-tilt,
+.postit-wrap.no-tilt .postit > * {
+  transform: none;
+}

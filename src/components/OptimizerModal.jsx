@@ -18,7 +18,7 @@ const OptimizerModal = ({ open, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="postit-wrap w-full max-w-lg"
+        className="postit-wrap no-tilt w-full max-w-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="postit relative bg-stone-100 p-6 text-left max-h-[85vh] overflow-y-auto">
