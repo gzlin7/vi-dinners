@@ -146,7 +146,7 @@ export function classifyIngredient(key) {
   return "Miscellaneous";
 }
 
-// Display order for rendering and PDF export
+// Display order for rendering
 export const groceryDeptOrder = [
   ...groceryDeptFilters.map((gf) => gf.name),
   "Miscellaneous",
