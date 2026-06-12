@@ -51,10 +51,24 @@ def unit_for(name):
         return None  # no clear dominance
     return unit
 
+# Hand-verified corrections for individually mangled rows (scrape artifacts
+# like "12 box Veggie Stock Concentrate", or counts that are clearly ounces)
+CORRECTIONS = {
+    "12 box Veggie Stock Concentrate": "1 unit Veggie Stock Concentrate",
+    "12 unit Veggie Stock Concentrate": "1 unit Veggie Stock Concentrate",
+    "16 box Soy Sauce": "4 tablespoon Soy Sauce",
+    "12 unit Sirloin Steak": "12 ounce Sirloin Steak",
+    "12 unit Chicken Breasts": "12 ounce Chicken Breasts",
+}
+
 rewrites = Counter()
 
 def fix_row(raw):
     raw = raw.strip()
+    if raw in CORRECTIONS:
+        fixed = CORRECTIONS[raw]
+        rewrites[f"{raw}  ->  {fixed}"] += 1
+        return fixed
     m = re.match(r"^([\d.]+)\s+(.*)$", raw)
     if not m:
         return raw

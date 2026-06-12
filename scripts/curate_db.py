@@ -21,6 +21,18 @@ IMPLAUSIBLE_KCAL = 400  # no real 2-serving dinner kit is under this per serving
 
 db = json.loads(DB_PATH.read_text())
 
+# Dedupe by canonical_url (the scrape collected the same recipe from
+# multiple menu weeks); keep the first occurrence
+seen = set()
+deduped = []
+for r in db:
+    if r["canonical_url"] in seen:
+        continue
+    seen.add(r["canonical_url"])
+    deduped.append(r)
+print(f"deduped {len(db) - len(deduped)} duplicate rows ({len(db)} -> {len(deduped)})")
+db = deduped
+
 products = [r for r in db if len(r["ingredients"].split(";")) <= PRODUCT_MAX_INGREDIENTS]
 kept = [r for r in db if len(r["ingredients"].split(";")) > PRODUCT_MAX_INGREDIENTS]
 
