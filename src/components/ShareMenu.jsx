@@ -63,7 +63,7 @@ const ShareMenu = ({ selectedRecipes, portions }) => {
         onClick={toggle}
         aria-label="Share this menu"
         title="Share this menu"
-        className="px-4 py-2.5 bg-[#4caf50] text-white rounded-sm shadow-[2px_4px_6px_rgba(60,35,10,0.3)] transition-all duration-200 ease-in-out hover:bg-[#3d9140] active:scale-95"
+        className="inline-flex items-center justify-center h-11 px-4 bg-[#4caf50] text-white rounded-lg transition-colors duration-150 hover:bg-[#3d9140] active:scale-95"
       >
         <ShareIcon />
       </button>

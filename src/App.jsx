@@ -145,7 +145,7 @@ function App() {
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={randomizeRecipes}
-            className="handwritten text-2xl px-6 py-1.5 bg-[#f97316] text-white rounded-sm shadow-[2px_4px_6px_rgba(60,35,10,0.3)] transition-all duration-200 ease-in-out hover:bg-[#ea580c] active:scale-95"
+            className="handwritten text-2xl inline-flex items-center h-11 px-6 bg-[#f97316] text-white rounded-lg transition-colors duration-150 hover:bg-[#ea580c] active:scale-95"
           >
             Reroll
           </button>
