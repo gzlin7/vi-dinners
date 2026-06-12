@@ -5,6 +5,7 @@ import recipes from "./lib/data/hello-fresh.json";
 import {generatePdf} from "./lib/exportPdf.js";
 import { pickBiasedRecipes } from "./lib/recipeScorer.js";
 import LeftoverForecast from "./components/LeftoverForecast.jsx";
+import OptimizerModal from "./components/OptimizerModal.jsx";
 
 function App() {
   const shoppingListRef = useRef();
@@ -18,6 +19,7 @@ function App() {
   const [portions, setPortions] = useState(2);
   // Bias rerolls toward sharing high-waste-risk ingredients (fewer groceries)
   const [minimizeShopping, setMinimizeShopping] = useState(true);
+  const [showOptimizerInfo, setShowOptimizerInfo] = useState(false);
 
   // Populate recipes on first load
   useEffect(() => {
@@ -112,15 +114,25 @@ function App() {
           <span className="handwritten text-3xl ml-3">{portions}</span>
         </div>
 
-        <label className="handwritten text-2xl flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={minimizeShopping}
-            onChange={(e) => setMinimizeShopping(e.target.checked)}
-            className="size-4 accent-[#f97316] cursor-pointer"
-          />
-          🧲 Fewer groceries
-        </label>
+        <div className="flex items-center gap-2">
+          <label className="handwritten text-2xl flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={minimizeShopping}
+              onChange={(e) => setMinimizeShopping(e.target.checked)}
+              className="size-4 accent-[#f97316] cursor-pointer"
+            />
+            Reduce leftovers
+          </label>
+          <button
+            onClick={() => setShowOptimizerInfo(true)}
+            aria-label="How does this work?"
+            title="How does this work?"
+            className="size-5 rounded-full border border-gray-400 text-gray-500 text-xs leading-none hover:bg-white hover:text-gray-700"
+          >
+            ?
+          </button>
+        </div>
 
         <div className="flex flex-wrap justify-center gap-3">
           <button
@@ -138,6 +150,11 @@ function App() {
           </button>
         </div>
       </div>
+
+      <OptimizerModal
+        open={showOptimizerInfo}
+        onClose={() => setShowOptimizerInfo(false)}
+      />
 
       {/* Cards + leftover forecast sidebar (forecast stacks on top when
           the screen is too narrow for a side column) */}
