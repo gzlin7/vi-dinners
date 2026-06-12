@@ -26,33 +26,37 @@ const RecipeCard = ({ index, title, image, canonical_url, nutrition, onClick, is
           <LockIcon open={!isLocked} />
         </div>
       </div>
-      {/* Link sits above the card's lock-click: clicking it must not toggle */}
-      <a
-        href={canonical_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative z-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-4 text-center">
-          {/* Clamp to two lines with matching min-height so all cards stay
-              the same size; full title available via native tooltip */}
-          <h3
-            className="link handwritten text-2xl line-clamp-2 min-h-16"
-            title={title}
-          >
-            {title}
-          </h3>
-        </div>
-      </a>
+      <div className="px-4 pt-4 text-center">
+        {/* Clamp to two lines with matching min-height so all cards stay
+            the same size; full title available via native tooltip */}
+        <h3
+          className="handwritten text-2xl line-clamp-2 min-h-16"
+          title={title}
+        >
+          {title}
+        </h3>
+      </div>
       {/* Macros from the scraped data, which is already per serving */}
       {nutrition && nutrition.calories != null && (
-        <div className="px-4 pb-4 -mt-2 text-center text-sm text-gray-500">
+        <div className="px-4 -mt-1 text-center text-sm text-gray-500">
           {nutrition.calories} kcal · {nutrition.protein_g}g protein ·{" "}
           {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat{" "}
           <span className="text-gray-400">(per serving)</span>
         </div>
       )}
+      {/* Explicit link instead of a linked title: on touch devices an
+          invisible title-link zone steals taps meant to lock the card */}
+      <div className="pb-3 pt-1 text-center">
+        <a
+          href={canonical_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="relative z-10 text-sm text-[#c4704f] underline decoration-dotted underline-offset-2 hover:text-[#b05f40]"
+        >
+          View recipe ↗
+        </a>
+      </div>
     </div>
   );
 };
