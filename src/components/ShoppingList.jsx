@@ -184,7 +184,7 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
 
   return (
     <div className="shopping-list w-full max-w-[1600px] mx-auto mt-6">
-      <h3 className="handwritten text-4xl font-bold">Grocery List</h3>
+      <h3 className="handwritten text-4xl font-bold text-center">Grocery List</h3>
 
       <BlendModal
         blend={openBlendKey ? spiceBlends[openBlendKey] : null}
