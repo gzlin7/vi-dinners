@@ -3,6 +3,8 @@ import RecipeCards from "./components/RecipeCards";
 import ShoppingList from "./components/ShoppingList";
 import recipes from "./lib/data/hello-fresh.json";
 import {generatePdf} from "./lib/exportPdf.js";
+import { pickBiasedRecipes } from "./lib/recipeScorer.js";
+import LeftoverForecast from "./components/LeftoverForecast.jsx";
 
 function App() {
   const shoppingListRef = useRef();
@@ -14,6 +16,8 @@ function App() {
   // Servings to shop for; recipes are written for 2, so the shopping list
   // scales quantities by portions/2
   const [portions, setPortions] = useState(2);
+  // Bias rerolls toward sharing high-waste-risk ingredients (fewer groceries)
+  const [minimizeShopping, setMinimizeShopping] = useState(true);
 
   // Populate recipes on first load
   useEffect(() => {
@@ -21,18 +25,39 @@ function App() {
     setlockedIndices([]);
   }, [numDisplayedRecipes]); // Re-randomize when number of recipes changes
 
-  // Function to get desired number (1 to 6) of random recipes
+  // Re-roll unlocked slots. With minimizeShopping, picks are biased toward
+  // sharing high-waste-risk ingredients with the locked recipes (and each
+  // other) while avoiding repeated proteins/cuisines; otherwise uniform.
+  // Either way, no duplicates within the menu.
   const randomizeRecipes = () => {
-    let newSelectedRecipes = [];
-    for (let i = 0; i < numDisplayedRecipes; i++) {
-      if (lockedIndices.includes(i)) {
-        newSelectedRecipes.push(selectedRecipes[i]);
-      } else {
-        // could have dupes...
-        newSelectedRecipes.push(
-          recipes[Math.floor(Math.random() * numTotalRecipes)]
-        );
+    const locked = lockedIndices
+      .filter((i) => i < numDisplayedRecipes)
+      .map((i) => selectedRecipes[i])
+      .filter(Boolean);
+    const slotsToFill = numDisplayedRecipes - locked.length;
+
+    let picks;
+    if (minimizeShopping) {
+      picks = pickBiasedRecipes(recipes, locked, slotsToFill);
+    } else {
+      const takenUrls = new Set(locked.map((r) => r.canonical_url));
+      picks = [];
+      while (picks.length < slotsToFill) {
+        const r = recipes[Math.floor(Math.random() * numTotalRecipes)];
+        if (takenUrls.has(r.canonical_url)) continue;
+        takenUrls.add(r.canonical_url);
+        picks.push(r);
       }
+    }
+
+    let pickIdx = 0;
+    const newSelectedRecipes = [];
+    for (let i = 0; i < numDisplayedRecipes; i++) {
+      newSelectedRecipes.push(
+        lockedIndices.includes(i) && selectedRecipes[i]
+          ? selectedRecipes[i]
+          : picks[pickIdx++]
+      );
     }
     setSelectedRecipes(newSelectedRecipes);
   };
@@ -87,12 +112,22 @@ function App() {
           <span className="handwritten text-3xl ml-3">{portions}</span>
         </div>
 
+        <label className="handwritten text-2xl flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={minimizeShopping}
+            onChange={(e) => setMinimizeShopping(e.target.checked)}
+            className="size-4 accent-[#f97316] cursor-pointer"
+          />
+          🧲 Fewer groceries
+        </label>
+
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={randomizeRecipes}
             className="handwritten text-2xl px-6 py-1.5 bg-[#f97316] text-white rounded-sm shadow-[2px_4px_6px_rgba(60,35,10,0.3)] transition-all duration-200 ease-in-out hover:bg-[#ea580c] active:scale-95"
           >
-            Randomize Recipes
+            Reroll
           </button>
 
           <button
@@ -104,11 +139,21 @@ function App() {
         </div>
       </div>
 
-      <RecipeCards
-        recipes={selectedRecipes}
-        onCardClick={toggleLockRecipe}
-        lockedIndices={lockedIndices}
-      />
+      {/* Cards + leftover forecast sidebar (forecast stacks on top when
+          the screen is too narrow for a side column) */}
+      <div className="flex flex-col lg:flex-row lg:items-start max-w-[1600px] mx-auto">
+        <div className="flex-1 min-w-0">
+          <RecipeCards
+            recipes={selectedRecipes}
+            onCardClick={toggleLockRecipe}
+            lockedIndices={lockedIndices}
+          />
+        </div>
+        <LeftoverForecast
+          selectedRecipes={selectedRecipes}
+          portions={portions}
+        />
+      </div>
         <ShoppingList
           ref={shoppingListRef}
           selectedRecipes={selectedRecipes}
