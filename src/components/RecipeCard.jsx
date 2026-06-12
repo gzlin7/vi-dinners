@@ -40,8 +40,7 @@ const RecipeCard = ({ index, title, image, canonical_url, nutrition, onClick, is
       {nutrition && nutrition.calories != null && (
         <div className="px-4 -mt-1 text-center text-sm text-gray-500">
           {nutrition.calories} kcal · {nutrition.protein_g}g protein ·{" "}
-          {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat{" "}
-          <span className="text-gray-400">(per serving)</span>
+          {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat
         </div>
       )}
       {/* Explicit link instead of a linked title: on touch devices an

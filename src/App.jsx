@@ -2,27 +2,39 @@ import React, { useState, useEffect, useRef } from "react";
 import RecipeCards from "./components/RecipeCards";
 import ShoppingList from "./components/ShoppingList";
 import recipes from "./lib/data/hello-fresh.json";
-import {generatePdf} from "./lib/exportPdf.js";
 import { pickBiasedRecipes } from "./lib/recipeScorer.js";
+import { buildMenuUrl, parseMenuHash } from "./lib/menuShare.js";
 import LeftoverForecast from "./components/LeftoverForecast.jsx";
 import OptimizerModal from "./components/OptimizerModal.jsx";
 
+// A shared menu link (#m=...&p=...) reproduces that exact layout on load
+const sharedMenu = parseMenuHash(recipes);
+
 function App() {
-  const shoppingListRef = useRef();
-  const [selectedRecipes, setSelectedRecipes] = useState([]);
+  const [selectedRecipes, setSelectedRecipes] = useState(
+    () => sharedMenu?.recipes ?? []
+  );
   // indexes of locked
   const [lockedIndices, setlockedIndices] = useState([]);
   const numTotalRecipes = recipes.length;
-  const [numDisplayedRecipes, setNumDisplayedRecipes] = useState(6);
+  const [numDisplayedRecipes, setNumDisplayedRecipes] = useState(
+    sharedMenu ? sharedMenu.recipes.length : 6
+  );
   // Servings to shop for; recipes are written for 2, so the shopping list
   // scales quantities by portions/2
-  const [portions, setPortions] = useState(2);
+  const [portions, setPortions] = useState(sharedMenu?.portions ?? 2);
   // Bias rerolls toward sharing high-waste-risk ingredients (fewer groceries)
   const [minimizeShopping, setMinimizeShopping] = useState(true);
   const [showOptimizerInfo, setShowOptimizerInfo] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
-  // Populate recipes on first load
+  // Populate recipes on first load — unless a shared menu already did
+  const skipInitialRandomize = useRef(sharedMenu != null);
   useEffect(() => {
+    if (skipInitialRandomize.current) {
+      skipInitialRandomize.current = false;
+      return;
+    }
     randomizeRecipes();
     setlockedIndices([]);
   }, [numDisplayedRecipes]); // Re-randomize when number of recipes changes
@@ -74,9 +86,17 @@ function App() {
     );
   };
 
-  // Function to export shopping list + recipes as PDF
-  const exportToPdf = () => {
-    generatePdf(selectedRecipes, shoppingListRef.current.getGroceries());
+  // Copy a link that reproduces this exact menu (and pin it to the URL bar)
+  const shareMenu = async () => {
+    const { url, hash } = buildMenuUrl(selectedRecipes, portions);
+    history.replaceState(null, "", hash);
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      window.prompt("Copy this link:", url);
+    }
   };
 
   return (
@@ -143,10 +163,10 @@ function App() {
           </button>
 
           <button
-            onClick={exportToPdf}
+            onClick={shareMenu}
             className="handwritten text-2xl px-6 py-1.5 bg-[#4caf50] text-white rounded-sm shadow-[2px_4px_6px_rgba(60,35,10,0.3)] transition-all duration-200 ease-in-out hover:bg-[#3d9140] active:scale-95"
           >
-            Export as PDF
+            {linkCopied ? "Link Copied! ✓" : "Get Link"}
           </button>
         </div>
       </div>
@@ -171,11 +191,7 @@ function App() {
           portions={portions}
         />
       </div>
-        <ShoppingList
-          ref={shoppingListRef}
-          selectedRecipes={selectedRecipes}
-          portions={portions}
-        />
+        <ShoppingList selectedRecipes={selectedRecipes} portions={portions} />
     </div>
   );
 }

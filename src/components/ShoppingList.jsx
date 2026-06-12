@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { shouldOmitIngredient, pantryFilterSubstring, classifyIngredient, groceryDeptOrder } from "../lib/groceryFilters.js";
 import { aggregateIngredients, displayUnit, formatQuantity } from "../lib/ingredientAggregator.js";
 import { spiceBlends } from "../lib/spiceBlends.js";
@@ -19,7 +19,7 @@ const deptStyles = {
 };
 const fallbackStyle = { emoji: "🛒", bin: "bg-white", border: "border-gray-200" };
 
-const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
+const ShoppingList = ({ selectedRecipes, portions }) => {
   // Keys of items expanded to show per-recipe portioning
   const [expandedKeys, setExpandedKeys] = useState(new Set());
   // Keys of items checked off while shopping
@@ -106,21 +106,6 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
   groceryItems.forEach((item) => {
     groceryDeptDict[classifyIngredient(item.key)].push(item);
   });
-
-  useImperativeHandle(ref, () => ({
-    // PDF export consumes plain strings per department
-    getGroceries: () =>
-      Object.fromEntries(
-        Object.entries(groceryDeptDict).map(([dept, deptItems]) => [
-          dept,
-          deptItems.map((item) =>
-            item.recipeCount > 1
-              ? `${item.display} (${item.recipeCount})`
-              : item.display
-          ),
-        ])
-      ),
-  }));
 
   const renderItem = (item) => {
     const checked = checkedKeys.has(item.key);
@@ -251,6 +236,6 @@ const ShoppingList = forwardRef(({ selectedRecipes, portions }, ref) => {
       </div>
     </div>
   );
-});
+};
 
 export default ShoppingList;
