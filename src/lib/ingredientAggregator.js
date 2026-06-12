@@ -33,12 +33,15 @@ export function normalizeUnit(unit) {
   return unitSynonyms[u] || u;
 }
 
-// Known measure words, used to strip strays like "unit Olive Oil" where the
-// data has a unit but no quantity
+// The complete unit vocabulary observed in the data. The parser validates
+// the unit token against this list — otherwise "1 New York Strip Steak"
+// parses as unit "New", name "York Strip Steak" (and "1 Yellow Onion" as a
+// "yellow" of onion).
 const knownUnits = new Set([
   "unit", "box", "tablespoon", "teaspoon", "ounce", "cup", "clove", "jar",
   "can", "pound", "gram", "kilogram", "milliliter", "liter", "piece",
-  "slice", "bunch", "head", "pinch", "dash",
+  "slice", "bunch", "head", "pinch", "dash", "thumb", "pack", "bun",
+  "tube", "fillet", "bottle", "sprig", "leave", "stalk", "cube",
 ]);
 
 const unitAbbrev = { ounce: "oz" };
@@ -61,7 +64,7 @@ export function normalizeName(name) {
 // { quantity: null, unit: null, name }.
 export function parseIngredient(raw) {
   const match = raw.trim().match(/^([\d.]+)\s+(\S+)\s+(.*)$/);
-  if (match) {
+  if (match && knownUnits.has(normalizeUnit(match[2]))) {
     return {
       quantity: parseFloat(match[1]),
       unit: match[2],
