@@ -87,7 +87,7 @@ const ShoppingList = ({ selectedRecipes, portions }) => {
   // Quantities scale by portions; HelloFresh recipes are written for 2.
   const items = aggregateIngredients(selectedRecipes, {
     shouldOmit: shouldOmitIngredient,
-    scale: portions / 2,
+    portions,
   });
 
   // Separate pantry ingredients

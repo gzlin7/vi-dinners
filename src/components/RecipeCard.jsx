@@ -12,7 +12,7 @@ const LockIcon = ({ open }) =>
     </svg>
   );
 
-const RecipeCard = ({ index, title, image, canonical_url, nutrition, onClick, isLocked }) => {
+const RecipeCard = ({ index, title, image, canonical_url, calories, protein_g, carbs_g, fat_g, onClick, isLocked }) => {
   return (
     <div
       key={index}
@@ -37,10 +37,10 @@ const RecipeCard = ({ index, title, image, canonical_url, nutrition, onClick, is
         </h3>
       </div>
       {/* Macros from the scraped data, which is already per serving */}
-      {nutrition && nutrition.calories != null && (
+      {calories != null && (
         <div className="px-4 -mt-1 text-center text-sm text-gray-500">
-          {nutrition.calories} kcal · {nutrition.protein_g}g protein ·{" "}
-          {nutrition.carbs_g}g carbs · {nutrition.fat_g}g fat
+          {calories} kcal · {protein_g}g protein · {carbs_g}g carbs ·{" "}
+          {fat_g}g fat
         </div>
       )}
       {/* Explicit link instead of a linked title: on touch devices an

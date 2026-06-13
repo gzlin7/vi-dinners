@@ -7,8 +7,13 @@ Resumable: results append to nutrition.jsonl as they arrive; URLs already
 present (success or permanent failure) are skipped on re-run.
 
 Usage:
-  python3 scripts/scrape_nutrition.py            # scrape (resumes)
-  python3 scripts/scrape_nutrition.py --merge    # merge JSONL into the JSON db
+  python3 scripts/scrape_nutrition.py             # scrape (resumes)
+  python3 scripts/scrape_nutrition.py --merge     # merge JSONL into the JSON db
+  python3 scripts/scrape_nutrition.py --normalize # flatten existing db in place
+
+Both --merge and --normalize write the recipe's nutrition as flat
+top-level columns (calories, protein_g, ...) — all info in one source — and
+a numeric base_servings parsed from the yields string ("2 servings" -> 2).
 """
 
 import json
@@ -32,6 +37,24 @@ USER_AGENT = (
 LDJSON_RE = re.compile(
     r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', re.S
 )
+
+# Flat nutrition columns written onto each recipe (per serving)
+NUTRITION_COLS = [
+    "calories", "protein_g", "carbs_g", "fat_g",
+    "saturated_fat_g", "sugar_g", "fiber_g", "sodium_mg",
+]
+
+
+def parse_base_servings(yields):
+    """'2 servings' -> 2; defaults to 2 when unparseable."""
+    m = re.search(r"\d+", yields or "")
+    return int(m.group(0)) if m else 2
+
+
+def apply_nutrition(recipe, nutrition):
+    """Write nutrition dict as flat top-level columns (drop missing as None)."""
+    for col in NUTRITION_COLS:
+        recipe[col] = (nutrition or {}).get(col)
 
 
 def fetch(url):
@@ -153,9 +176,10 @@ def merge():
 
     merged = 0
     for recipe in db:
+        recipe["base_servings"] = parse_base_servings(recipe.get("yields"))
         rec = by_url.get(recipe["canonical_url"])
         if rec and rec["nutrition"].get("calories") is not None:
-            recipe["nutrition"] = rec["nutrition"]
+            apply_nutrition(recipe, rec["nutrition"])
             if "rating" in rec:
                 recipe["rating"] = rec["rating"]
             merged += 1
@@ -164,8 +188,28 @@ def merge():
     print(f"merged nutrition into {merged}/{len(db)} recipes")
 
 
+def normalize():
+    """One-time in-place migration of the existing db: flatten any nested
+    `nutrition` object to top-level columns and add numeric base_servings.
+    Idempotent."""
+    db = json.loads(DB_PATH.read_text())
+    flattened = 0
+    for recipe in db:
+        recipe["base_servings"] = parse_base_servings(recipe.get("yields"))
+        nested = recipe.pop("nutrition", None)
+        if nested is not None:
+            apply_nutrition(recipe, nested)
+            flattened += 1
+    with_cal = sum(1 for r in db if r.get("calories") is not None)
+    DB_PATH.write_text(json.dumps(db))
+    print(f"flattened {flattened} nested blocks; {with_cal}/{len(db)} have "
+          f"calories; base_servings set on all")
+
+
 if __name__ == "__main__":
     if "--merge" in sys.argv:
         merge()
+    elif "--normalize" in sys.argv:
+        normalize()
     else:
         scrape()

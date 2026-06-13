@@ -8,7 +8,7 @@ import { storeQuantities } from "./storeQuantities.js";
 export function computeLeftovers(selectedRecipes, portions) {
   const items = aggregateIngredients(selectedRecipes, {
     shouldOmit: shouldOmitIngredient,
-    scale: portions / 2,
+    portions,
   });
 
   const leftovers = [];

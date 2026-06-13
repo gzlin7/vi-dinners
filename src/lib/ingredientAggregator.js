@@ -109,12 +109,14 @@ export function formatQuantity(quantity) {
  */
 export function aggregateIngredients(
   recipes,
-  { shouldOmit = () => false, scale = 1 } = {}
+  { shouldOmit = () => false, portions = null } = {}
 ) {
   const itemMap = new Map();
 
   recipes.forEach((recipe) => {
     if (!recipe) return;
+    // Scale each recipe's quantities from its own base serving count
+    const scale = portions ? portions / (recipe.base_servings || 2) : 1;
     recipe.ingredients.split(";").forEach((raw) => {
       const { quantity, unit, name } = parseIngredient(raw);
       const key = normalizeName(name);
