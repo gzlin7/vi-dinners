@@ -10,8 +10,11 @@ lerna-debug.log*
 # Local AI agent context
 AGENTS.md
 
-# Scrape working output (merged into src/lib/data when complete)
-scripts/nutrition.jsonl
+# Local-only scripts (scrapers, one-off data tools) and their working output
+scripts/
+
+# Python venv for scripts/
+.venv/
 
 node_modules
 dist
