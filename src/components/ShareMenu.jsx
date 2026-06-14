@@ -63,7 +63,7 @@ const ShareMenu = ({ selectedRecipes, portions }) => {
         onClick={toggle}
         aria-label="Share this menu"
         title="Share this menu"
-        className="inline-flex items-center justify-center h-11 px-4 bg-[#4caf50] text-white rounded-lg transition-colors duration-150 hover:bg-[#3d9140] active:scale-95"
+        className="inline-flex items-center justify-center px-4 py-1.5 rotate-[1.5deg] rounded-md border-[2.5px] border-[#4caf50] text-[#4caf50] transition-colors duration-150 hover:bg-[#4caf50] hover:text-white active:scale-95"
       >
         <ShareIcon />
       </button>
@@ -78,7 +78,7 @@ const ShareMenu = ({ selectedRecipes, portions }) => {
               readOnly
               value={url}
               onFocus={(e) => e.target.select()}
-              className="flex-1 min-w-0 text-xs font-mono border border-gray-300 rounded px-2 py-1.5 text-gray-700 bg-gray-50"
+              className="flex-1 min-w-0 select-text text-xs font-mono border border-gray-300 rounded px-2 py-1.5 text-gray-700 bg-gray-50"
             />
             <button
               onClick={copy}

@@ -1,7 +1,7 @@
 import React from "react";
 import RecipeCard from "./RecipeCard";
 
-const RecipeCards = ({ recipes, onCardClick, lockedIndices }) => {
+const RecipeCards = ({ recipes, onCardClick, onReroll, lockedIndices }) => {
   return (
     <div className="w-full max-w-[1600px] mx-auto p-6">
       {/* Responsive Grid */}
@@ -12,6 +12,7 @@ const RecipeCards = ({ recipes, onCardClick, lockedIndices }) => {
             index={index}
             {...recipe}
             onClick={onCardClick}
+            onReroll={onReroll}
             isLocked={lockedIndices.includes(index)} // Check if the recipe is locked
           />
         ))}

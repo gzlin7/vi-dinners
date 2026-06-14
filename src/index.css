@@ -25,6 +25,15 @@ body {
   font-family: 'Patrick Hand', cursive;
 }
 
+/* Horizontal control bar: a low, wide cream slip with a soft shadow and a hair
+   of tilt. Selections are "marked" with a hand-drawn circle (see PenCircle). */
+.control-bar {
+  background-color: #fffdf6;
+  border-radius: 2px; /* sharp, to match the post-its and polaroid cards */
+  box-shadow: 1px 3px 12px rgba(60, 35, 10, 0.18);
+  transform: rotate(-0.3deg);
+}
+
 /* Smooth scrolling behavior */
 html {
   scroll-behavior: smooth;
@@ -118,6 +127,12 @@ button:active {
 .card:hover .lock-overlay,
 .lock-overlay.locked {
   opacity: 1;
+}
+
+/* Hovering the swap button shouldn't also tease the lock overlay — that mixes
+   "lock" and "swap" signals. Locked cards keep their badge regardless. */
+.card:has(.swap-control:hover) .lock-overlay:not(.locked) {
+  opacity: 0;
 }
 
 .card:hover .lock-overlay .lock-icon,

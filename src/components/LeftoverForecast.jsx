@@ -1,14 +1,13 @@
 import { computeLeftovers } from "../lib/leftovers.js";
 
-// Sidebar post-it to the right of the recipe cards (above them on narrow
-// screens) so the forecast stays in view while rerolling. Always rendered so
-// the card grid doesn't change width when the list empties. Hover an item
-// for what to buy.
+// Post-it in the sidebar (positioning owned by the parent <aside>). Always
+// rendered so the card grid doesn't change width when the list empties. Hover
+// an item for what to buy.
 const LeftoverForecast = ({ selectedRecipes, portions }) => {
   const leftovers = computeLeftovers(selectedRecipes, portions);
 
   return (
-    <div className="postit-wrap order-first lg:order-none w-full max-w-sm mx-auto lg:mx-0 lg:w-64 lg:shrink-0 lg:sticky lg:top-4 mt-5 lg:mt-6 lg:mr-6">
+    <div className="postit-wrap">
       <div className="bg-stone-100 postit p-4 text-left">
         <h4 className="handwritten text-2xl flex justify-between items-baseline border-b border-stone-300 pb-1 mb-2">
           <span>🥡 Leftover forecast</span>
