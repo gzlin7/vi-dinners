@@ -6,7 +6,7 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/vi-dinners",
+  base: "/mise-en-cart",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
